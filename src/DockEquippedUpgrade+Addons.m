@@ -3,6 +3,7 @@
 #import "DockCaptain+Addons.h"
 #import "DockEquippedShip+Addons.h"
 #import "DockEquippedUpgrade.h"
+#import "DockSetItem+Addons.h"
 #import "DockShip+Addons.h"
 #import "DockSquad+Addons.h"
 #import "DockUpgrade+Addons.h"
@@ -32,7 +33,7 @@
 
 -(NSString*)faction
 {
-    return self.upgrade.faction;
+    return self.upgrade.anyFaction;
 }
 
 -(BOOL)isPlaceholder

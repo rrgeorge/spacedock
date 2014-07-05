@@ -292,7 +292,7 @@ NSString* kShowDataModelExport = @"showDataModelExport";
         }
     }
 
-    NSURL* url = [applicationFilesDirectory URLByAppendingPathComponent: @"Space_Dock.storedata"];
+    NSURL* url = [applicationFilesDirectory URLByAppendingPathComponent: @"Space_Dock_Tagged.storedata"];
     NSPersistentStoreCoordinator* coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: mom];
 
     NSDictionary* options = @{
@@ -1449,7 +1449,7 @@ static void doSelectIndex(NSInteger index, NSArrayController* controller, NSTabl
 {
     if (target == targetShip) {
         DockShip* ship = targetShip.ship;
-        if (![_factionName isEqualToString: ship.faction]) {
+        if (![ship isFaction: _factionName]) {
             [self resetFactionFilter: nil];
         }
         [_tabView selectTabViewItemWithIdentifier: @"ships"];
@@ -1457,8 +1457,7 @@ static void doSelectIndex(NSInteger index, NSArrayController* controller, NSTabl
     } else if ([target isKindOfClass: [DockEquippedFlagship class]]) {
         [_tabView selectTabViewItemWithIdentifier: @"flagships"];
         DockFlagship* flagship = [target flagship];
-        NSString* flagshipFaction = flagship.faction;
-        if (!([flagshipFaction isEqualToString: @"Independent"] || [flagshipFaction isEqualToString: _factionName])) {
+        if (!([flagship isFaction: @"Independent"] || [flagship isFaction: _factionName])) {
             [self resetFactionFilter: nil];
         }
         [self showItem: [target flagship] controller: _flagshipsController table: _flagshipsTableView];
@@ -1466,10 +1465,10 @@ static void doSelectIndex(NSInteger index, NSArrayController* controller, NSTabl
         DockEquippedUpgrade* eu = target;
         DockUpgrade* upgrade = eu.upgrade;
         if (![upgrade isPlaceholder]) {
-            if (![_factionName isEqualToString: upgrade.faction]) {
+            if (![upgrade isFaction: _factionName]) {
                 [self resetFactionFilter: nil];
             }
-            if (![_upType isEqualToString: upgrade.upType]) {
+            if (![upgrade isType: _upType]) {
                 [self resetUpgradeFilter: nil];
             }
             if (upgrade.isCaptain) {
@@ -1517,13 +1516,13 @@ static void doSelectIndex(NSInteger index, NSArrayController* controller, NSTabl
 
 -(IBAction)filterToClickedFaction:(id)sender
 {
-    [self updateFactionFilter: [[[self clickedEquippedShip] ship] faction]];
+    [self updateFactionFilter: [[[self clickedEquippedShip] ship] anyFaction]];
 }
 
 -(IBAction)filterToClickedUpgradeType:(id)sender
 {
     DockUpgrade* upgrade = [[self clickedSquadItem] upgrade];
-    [self updateUpgradeTypeFilter: [upgrade upType]];
+    [self updateUpgradeTypeFilter: [upgrade anyType]];
 }
 
 -(IBAction)filterToClickedFactionAndUpgradeType:(id)sender
@@ -1631,7 +1630,7 @@ void addRemoveFlagshipItem(NSMenu *menu)
             [self addChangeShipItem:menu];
             DockEquippedShip* ship = [self clickedEquippedShip];
             addShowDetailsItem(menu);
-            addFilterToFactionItem(menu, ship.ship.faction);
+            addFilterToFactionItem(menu, ship.ship.anyFaction);
             addDeleteItem(menu);
         } else if ([target isKindOfClass: [DockEquippedFlagship class]]) {
             addShowDetailsItem(menu);
@@ -1641,10 +1640,10 @@ void addRemoveFlagshipItem(NSMenu *menu)
             if (!eu.isPlaceholder) {
                 addShowDetailsItem(menu);
             }
-            addFilterToFactionItem(menu, eu.equippedShip.ship.faction);
+            addFilterToFactionItem(menu, eu.equippedShip.ship.anyFaction);
             if (!eu.upgrade.isCaptain) {
-                addFilterToTypeItem(menu, eu.upgrade.upType);
-                addFilterToFactionAndTypeItem(menu, eu.equippedShip.ship.faction, eu.upgrade.upType);
+                addFilterToTypeItem(menu, eu.upgrade.anyType);
+                addFilterToFactionAndTypeItem(menu, eu.equippedShip.ship.anyFaction, eu.upgrade.anyType);
                 if (!eu.isPlaceholder) {
                     addOverrideItems(menu);
                 }

@@ -1,5 +1,6 @@
 #import "DockCaptain+Addons.h"
 
+#import "DockSetItem+Addons.h"
 #import "DockShip+Addons.h"
 #import "DockUpgrade+Addons.h"
 #import "DockUtils.h"
@@ -31,7 +32,7 @@
 +(DockUpgrade*)zeroCostCaptainForShip:(DockShip*)targetShip
 {
     NSManagedObjectContext* context = targetShip.managedObjectContext;
-    NSString* faction = targetShip.faction;
+    NSString* faction = targetShip.anyFaction;
     NSSet* targetShipSets = targetShip.sets;
     NSEntityDescription* entity = [NSEntityDescription entityForName: @"Captain" inManagedObjectContext: context];
     NSFetchRequest* request = [[NSFetchRequest alloc] init];
@@ -99,7 +100,7 @@
 
 -(NSString*)sortStringForSet
 {
-    return [NSString stringWithFormat: @"%@:b:%@:%c:%@", self.faction, self.upSortType, 'z' - [self.skill intValue], self.title];
+    return [NSString stringWithFormat: @"%@:b:%@:%c:%@", self.anyFaction, self.upSortType, 'z' - [self.skill intValue], self.title];
 }
 
 -(NSString*)itemDescription

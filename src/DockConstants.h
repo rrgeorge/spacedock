@@ -12,3 +12,9 @@ extern NSString* kSquadTooLargeToPrint;
 extern NSString* kFlagshipPrintingError;
 
 extern NSString* kDockBundleIdentifier;
+
+// tags
+extern NSString* kFactionTagType;
+extern NSString* kSpecialTagType;
+extern NSString* kUpgradeTypeTagType;
+

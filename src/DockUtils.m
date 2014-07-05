@@ -3,6 +3,7 @@
 #import "DockConstants.h"
 #import "DockEquippedShip+Addons.h"
 #import "DockResource+Addons.h"
+#import "DockSetItem+Addons.h"
 #import "DockShip+Addons.h"
 #import "DockSquad+Addons.h"
 #import "DockUpgrade.h"
@@ -37,7 +38,7 @@ NSSet* allAttributes(NSManagedObjectContext* context, NSString* entityName, NSSt
 
 NSString* factionCode(id target)
 {
-    NSString* faction = [target faction];
+    NSString* faction = [target anyFaction];
     return [faction substringToIndex: 3];
 }
 

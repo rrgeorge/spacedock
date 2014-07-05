@@ -483,7 +483,8 @@ static BOOL sIsImporting = NO;
     int i = 1;
 
     for (DockEquippedShip* ship in self.equippedShips) {
-        NSString* s = [NSString stringWithFormat: @"Ship %d  %@ %1@  %5d\n", i, [ship.title stringByPaddingToLength: 43 withString: @" " startingAtIndex: 0], [ship.ship.faction substringToIndex: 1], [ship.ship.cost intValue]];
+        NSString* s = [NSString stringWithFormat: @"Ship %d  %@ %1@  %5d\n", i, [ship.title stringByPaddingToLength: 43 withString: @" " startingAtIndex: 0],
+        ship.factionCode, [ship.ship.cost intValue]];
         [textFormat appendString: s];
 
         for (DockEquippedUpgrade* upgrade in ship.sortedUpgrades) {
@@ -800,7 +801,7 @@ static NSString* namePrefix(NSString* originalName)
         if (existing) {
             if (error) {
                 NSString* msg = [NSString stringWithFormat: @"Can't add %@ to the selected squadron.", upgrade.title];
-                NSString* info = [NSString stringWithFormat: @"This %@ is unique and one with the same name already exists in the squadron.", upgrade.upType];
+                NSString* info = [NSString stringWithFormat: @"This item is unique and one with the same name already exists in the squadron."];
                 NSDictionary* d = @{
                     NSLocalizedDescriptionKey: msg,
                     NSLocalizedFailureReasonErrorKey: info,

@@ -2,7 +2,7 @@
 //  DockFlagship.m
 //  Space Dock
 //
-//  Created by Rob Tsuk on 4/12/14.
+//  Created by Rob Tsuk on 7/5/14.
 //  Copyright (c) 2014 Rob Tsuk. All rights reserved.
 //
 
@@ -17,11 +17,8 @@
 @dynamic attack;
 @dynamic battleStations;
 @dynamic cloak;
-@dynamic cost;
 @dynamic crew;
 @dynamic evasiveManeuvers;
-@dynamic externalId;
-@dynamic faction;
 @dynamic hull;
 @dynamic scan;
 @dynamic sensorEcho;
@@ -29,7 +26,6 @@
 @dynamic talent;
 @dynamic targetLock;
 @dynamic tech;
-@dynamic title;
 @dynamic weapon;
 @dynamic ships;
 

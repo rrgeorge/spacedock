@@ -19,6 +19,9 @@
 -(BOOL)isBajoran;
 -(BOOL)isFederation;
 -(BOOL)isVulcan;
+-(BOOL)isType:(NSString*)type;
+-(NSString*)anyType;
+-(void)setType:(NSString*)type;
 -(NSComparisonResult)compareTo:(DockUpgrade*)other;
 -(int)limitForShip:(DockEquippedShip*)targetShip;
 -(int)additionalWeaponSlots;

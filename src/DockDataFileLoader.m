@@ -13,6 +13,7 @@
 #import "DockResource.h"
 #import "DockReference.h"
 #import "DockSet+Addons.h"
+#import "DockSetItem+Addons.h"
 #import "DockShip+Addons.h"
 #import "DockShipClassDetails+Addons.h"
 #import "DockSquad+Addons.h"
@@ -204,6 +205,13 @@ static NSMutableDictionary* createExistingItemsLookup(NSManagedObjectContext* co
                     DockShip* ship = (DockShip*)c;
                     NSString* shipClass =  [d valueForKey: key];
                     [ship updateShipClass: shipClass];
+                } else if ([key isEqualToString: @"Faction"]) {
+                    NSLog(@"faction");
+                    NSString* factionValue = [d valueForKey: key];
+                    NSArray* factions = [factionValue componentsSeparatedByString: @","];
+                    for (NSString* faction in factions) {
+                        [c addFaction: faction];
+                    }
                 }
             }
 
@@ -470,6 +478,7 @@ static NSString* makeKey(NSString* key)
 
 -(NSSet*)validateSpecials
 {
+#if 0
     NSSet* specials = allAttributes(_managedObjectContext, @"Upgrade", @"Special");
     specials = [specials setByAddingObjectsFromSet: allAttributes(_managedObjectContext, @"Resource", @"Special")];
     NSArray* handledSpecials = @[
@@ -512,6 +521,9 @@ static NSString* makeKey(NSString* key)
     NSMutableSet* unhandledSpecials = [[NSMutableSet alloc] initWithSet: specials];
     [unhandledSpecials minusSet: [NSSet setWithArray: handledSpecials]];
     return unhandledSpecials;
+#else
+    return nil;
+#endif
 }
 
 -(BOOL)loadData:(NSString*)pathToDataFile force:(BOOL)force error:(NSError**)error;

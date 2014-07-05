@@ -1,5 +1,6 @@
 #import "DockFlagship+Addons.h"
 
+#import "DockSetItem+Addons.h"
 #import "DockShip+Addons.h"
 #import "DockUtils.h"
 
@@ -99,10 +100,7 @@
 
 -(NSString*)name
 {
-    if ([self.faction isEqualToString: @"Independent"]) {
-        return self.title;
-    }
-    return self.faction;
+    return self.title;
 }
 
 -(NSString*)plainDescription
@@ -116,13 +114,11 @@
         return NO;
     }
     
-    NSString* myFaction = self.faction;
-    
-    if ([myFaction isEqualToString: @"Independent"]) {
+    if ([self isFaction: @"Independent"]) {
         return YES;
     }
     
-    return [myFaction isEqualToString: targetShip.faction];
+    return [self matchesFaction: targetShip];
 }
 
 -(BOOL)isFighterSquadron

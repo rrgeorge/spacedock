@@ -7,6 +7,7 @@
 #import "DockEquippedFlagship.h"
 #import "DockFlagship+Addons.h"
 #import "DockResource+Addons.h"
+#import "DockSetItem+Addons.h"
 #import "DockShip+Addons.h"
 #import "DockSideboard+Addons.h"
 #import "DockSquad+Addons.h"
@@ -198,7 +199,7 @@
     for (DockEquippedUpgrade* eu in self.upgrades) {
         DockUpgrade* upgrade = eu.upgrade;
 
-        if ([upgrade.upType isEqualToString: @"Captain"]) {
+        if ([upgrade isCaptain]) {
             return eu;
         }
     }
@@ -297,7 +298,7 @@
     int count = 0;
 
     for (DockEquippedUpgrade* eu in self.upgrades) {
-        if ([eu.upgrade.upType isEqualToString: upType]) {
+        if ([eu.upgrade isType: upType]) {
             count += 1;
         }
     }
@@ -327,7 +328,7 @@
 
 -(NSString*)shipFaction
 {
-    return self.ship.faction;
+    return self.ship.anyFaction;
 }
 
 -(void)establishPlaceholders
@@ -362,7 +363,7 @@
 -(DockEquippedUpgrade*)findPlaceholder:(NSString*)upType
 {
     for (DockEquippedUpgrade* eu in self.upgrades) {
-        if ([eu isPlaceholder] && [eu.upgrade.upType isEqualToString: upType]) {
+        if ([eu isPlaceholder] && [eu.upgrade isType: upType]) {
             return eu;
         }
     }
@@ -432,7 +433,7 @@
     }
 
     if ([upgradeSpecial isEqualToString: @"OnlyBorgCaptain"]) {
-        if (![self.captain.faction isEqualToString: @"Borg"]) {
+        if (![self.captain isFaction: @"Borg"]) {
             return NO;
         }
     }
@@ -501,9 +502,9 @@
                 info = [NSString stringWithFormat: @"This upgrade can only be installed on ships of class %@.", targetClass];
             } else {
                 if ([upgrade isTalent]) {
-                    info = [NSString stringWithFormat: @"This ship's captain has no %@ upgrade symbols.", [upgrade.upType lowercaseString]];
+                    info = [NSString stringWithFormat: @"This ship's captain has no %@ upgrade symbols.", [upgrade.anyType lowercaseString]];
                 } else {
-                    info = [NSString stringWithFormat: @"This ship has no %@ upgrade symbols on its ship card.", [upgrade.upType lowercaseString]];
+                    info = [NSString stringWithFormat: @"This ship has no %@ upgrade symbols on its ship card.", [upgrade.anyType lowercaseString]];
                 }
             }
         } else {
@@ -560,19 +561,19 @@
     equippedUpgrade.upgrade = upgrade;
 
     if (![upgrade isPlaceholder]) {
-        DockEquippedUpgrade* ph = [self findPlaceholder: upgrade.upType];
+        DockEquippedUpgrade* ph = [self findPlaceholder: upgrade.anyType];
 
         if (ph) {
             [self removeUpgrade: ph];
         }
     }
 
-    NSString* upType = [upgrade upType];
+    NSString* upType = [upgrade anyType];
     int limit = [upgrade limitForShip: self];
     int current = [self equipped: upType];
 
     if (current == limit) {
-        if (maybeReplace == nil || ![maybeReplace.upgrade.upType isEqualToString: upType]) {
+        if (maybeReplace == nil || ![maybeReplace.upgrade isType: upType]) {
             maybeReplace = [self firstUpgrade: upType];
         }
 
@@ -597,7 +598,7 @@
 -(DockEquippedUpgrade*)firstUpgrade:(NSString*)upType
 {
     for (DockEquippedUpgrade* eu in self.sortedUpgrades) {
-        if ([upType isEqualToString: eu.upgrade.upType]) {
+        if ([eu.upgrade isType: upType]) {
             return eu;
         }
     }
@@ -623,8 +624,8 @@
     for (DockEquippedUpgrade* eu in self.sortedUpgrades) {
         DockUpgrade* upgrade = eu.upgrade;
         if (![upgrade isCaptain]) {
-            if (upType == nil || [upType isEqualToString: upgrade.upType]) {
-                if (faction == nil || [faction isEqualToString: upgrade.faction]) {
+            if (upType == nil || [upgrade isType: upType]) {
+                if (faction == nil || [upgrade isFaction: faction]) {
                     [allUpgrades addObject: eu];
                 }
             }
@@ -690,7 +691,7 @@
     NSMutableArray* onesToRemove = [[NSMutableArray alloc] initWithCapacity: 0];
 
     for (DockEquippedUpgrade* eu in self.sortedUpgrades) {
-        if ([eu.upgrade isPlaceholder] && [upType isEqualToString: eu.upgrade.upType]) {
+        if ([eu.upgrade isPlaceholder] && [eu.upgrade isType: upType]) {
             [onesToRemove addObject: eu];
         }
 
@@ -701,7 +702,7 @@
 
     if (onesToRemove.count != targetCount) {
         for (DockEquippedUpgrade* eu in self.sortedUpgrades) {
-            if ([upType isEqualToString: eu.upgrade.upType]) {
+            if ([eu.upgrade isType: upType]) {
                 [onesToRemove addObject: eu];
             }
 

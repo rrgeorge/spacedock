@@ -177,12 +177,12 @@ NSString* asDegrees(NSString* textValue)
 
 -(BOOL)isFederation
 {
-    return [self.faction isEqualToString: @"Federation"];
+    return [self isFaction: @"Federation"];
 }
 
 -(BOOL)isBajoran
 {
-    return [self.faction isEqualToString: @"Bajoran"];
+    return [self isFaction: @"Bajoran"];
 }
 
 -(BOOL)isFighterSquadron
@@ -199,17 +199,17 @@ NSString* asDegrees(NSString* textValue)
 
 -(BOOL)isSpecies8472
 {
-    return [self.faction isEqualToString: @"Species 8472"];
+    return [self isFaction: @"Species 8472"];
 }
 
 -(BOOL)isKazon
 {
-    return [self.faction isEqualToString: @"Kazon"];
+    return [self isFaction: @"Kazon"];
 }
 
 -(BOOL)isBorg
 {
-    return [self.faction isEqualToString: @"Borg"];
+    return [self isFaction: @"Borg"];
 }
 
 -(BOOL)isVoyager
@@ -239,7 +239,7 @@ NSString* asDegrees(NSString* textValue)
 
 -(BOOL)isVulcan
 {
-    return [self.faction isEqualToString: @"Vulcan"];
+    return [self isFaction: @"Vulcan"];
 }
 
 -(int)techCount
@@ -340,7 +340,7 @@ NSString* asDegrees(NSString* textValue)
 
 -(NSString*)sortStringForSet
 {
-    return [NSString stringWithFormat: @"%@:a:%@:%@", self.faction, [self.unique boolValue] ? @"a" : @"z", self.title];
+    return [NSString stringWithFormat: @"%@:a:%@:%@", self.anyFaction, [self.unique boolValue] ? @"a" : @"z", self.title];
 }
 
 -(NSString*)itemDescription

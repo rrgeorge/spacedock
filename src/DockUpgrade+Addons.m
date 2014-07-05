@@ -1,12 +1,15 @@
 #import "DockUpgrade+Addons.h"
 
 #import "DockCaptain+Addons.h"
+#import "DockConstants.h"
 #import "DockCrew.h"
 #import "DockEquippedShip+Addons.h"
 #import "DockEquippedUpgrade+Addons.h"
 #import "DockFlagship+Addons.h"
 #import "DockResource.h"
+#import "DockSetItem+Addons.h"
 #import "DockShip+Addons.h"
+#import "DockTag+Addons.h"
 #import "DockTalent.h"
 #import "DockTech.h"
 #import "DockUtils.h"
@@ -25,7 +28,10 @@
 
     if (existingItems.count > 0) {
         for (DockUpgrade* upgrade in existingItems) {
-            [allFactionsSet addObject: upgrade.faction];
+            NSString* faction = upgrade.anyFaction;
+            if (faction != nil) {
+                [allFactionsSet addObject: upgrade.anyFaction];
+            }
         }
         return [NSSet setWithSet: allFactionsSet];
     }
@@ -80,7 +86,7 @@
 
         placeholderUpgrade = [[upClass alloc] initWithEntity: entity insertIntoManagedObjectContext: context];
         placeholderUpgrade.title = upType;
-        placeholderUpgrade.upType = upType;
+        [placeholderUpgrade setType: upType];
         placeholderUpgrade.placeholder = @YES;
     } else {
         placeholderUpgrade = existingItems[0];
@@ -106,37 +112,37 @@
         return self.title;
     }
 
-    return [NSString stringWithFormat: @"%@ (%@)", self.title, self.upType];
+    return [NSString stringWithFormat: @"%@ (%@)", self.title, self.anyType];
 }
 
 -(BOOL)isTalent
 {
-    return [self.upType isEqualToString: @"Talent"];
+    return [self isType: @"Talent"];
 }
 
 -(BOOL)isCrew
 {
-    return [self.upType isEqualToString: @"Crew"];
+    return [self isType: @"Crew"];
 }
 
 -(BOOL)isWeapon
 {
-    return [self.upType isEqualToString: @"Weapon"];
+    return [self isType: @"Weapon"];
 }
 
 -(BOOL)isCaptain
 {
-    return [self.upType isEqualToString: @"Captain"];
+    return [self isType: @"Captain"];
 }
 
 -(BOOL)isTech
 {
-    return [self.upType isEqualToString: @"Tech"];
+    return [self isType: @"Tech"];
 }
 
 -(BOOL)isBorg
 {
-    return [self.upType isEqualToString: @"Borg"];
+    return [self isType: @"Borg"];
 }
 
 -(BOOL)isPlaceholder
@@ -151,29 +157,47 @@
 
 -(BOOL)isDominion
 {
-    return [self.faction isEqualToString: @"Dominion"];
+    return [self isFaction: @"Dominion"];
 }
 
 -(BOOL)isKlingon
 {
-    return [self.faction isEqualToString: @"Klingon"];
+    return [self isFaction: @"Klingon"];
 }
 
 -(BOOL)isBajoran
 {
-    return [self.faction isEqualToString: @"Bajoran"];
+    return [self isFaction: @"Bajoran"];
 }
 
 -(BOOL)isFederation
 {
-    return [self.faction isEqualToString: @"Federation"];
+    return [self isFaction: @"Federation"];
 }
 
 -(BOOL)isVulcan
 {
-    return [self.faction isEqualToString: @"Vulcan"];
+    return [self isFaction: @"Vulcan"];
 }
 
+-(BOOL)isType:(NSString *)type
+{
+    DockTag* typeTag = [DockTag upgradeTypeTag: type context: self.managedObjectContext];
+    return [self.tags containsObject: typeTag];
+}
+
+-(NSString*)anyType
+{
+    NSSet* types = [self tagsOfType: kUpgradeTypeTagType];
+    return [[types anyObject] value];
+}
+
+-(void)setType:(NSString *)type
+{
+    DockTag* typeTag = [DockTag upgradeTypeTag: type context: self.managedObjectContext];
+    [self removeAllTagsOfType: kUpgradeTypeTagType];
+    [self addTagsObject: typeTag];
+}
 
 -(NSComparisonResult)compareTo:(DockUpgrade*)other
 {
@@ -272,12 +296,12 @@
         return @"AATalent";
     }
 
-    return self.upType;
+    return self.anyType;
 }
 
 -(NSString*)sortStringForSet
 {
-    return [NSString stringWithFormat: @"%@:c:%@:%@", self.faction, self.upSortType, self.title];
+    return [NSString stringWithFormat: @"%@:c:%@:%@", self.anyFaction, self.upSortType, self.title];
 }
 
 -(NSString*)itemDescription
@@ -357,8 +381,6 @@
     int cost = [upgrade.cost intValue];
 
     DockShip* ship = equippedShip.ship;
-    NSString* shipFaction = ship.faction;
-    NSString* upgradeFaction = upgrade.faction;
     DockCaptain* captain = equippedShip.captain;
     BOOL isSideboard = [equippedShip isResourceSideboard];
 
@@ -476,7 +498,7 @@
         }
     }
 
-    if (![shipFaction isEqualToString: upgradeFaction] && !equippedShip.isResourceSideboard && ![equippedShip.flagship.faction isEqualToString: upgradeFaction]) {
+    if (![ship matchesFaction: self] && !equippedShip.isResourceSideboard && ![equippedShip.flagship matchesFaction: self]) {
         if ([captainSpecial isEqualToString: @"UpgradesIgnoreFactionPenalty"] && ![upgrade isCaptain]) {
         } else if ([captainSpecial isEqualToString: @"NoPenaltyOnFederationOrBajoranShip"]  && [upgrade isCaptain]) {
             if (!([ship isFederation] || [ship isBajoran])) {
